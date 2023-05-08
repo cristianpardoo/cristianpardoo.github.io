@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>cristianpardoo.github.io</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body {
+			background: linear-gradient(to bottom right, #c758e9, #6cc6f0, #d3f3b5);
+			margin: 0;
+			padding: 0;
+			font-family: sans-serif;
+		}
+		header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 20px;
+			background-color: white;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+		}
+		h1 {
+			margin: 0;
+			font-size: 30px;
+			color: #9c27b0;
+			font-weight: normal;
+		}
+		.icon {
+			font-size: 40px;
+			color: #9c27b0;
+		}
+		.main-content {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			grid-gap: 20px;
+			padding: 20px;
+			max-width: 1000px;
+			margin: auto;
+			margin-top: 50px;
+		}
+		.card {
+			background-color: white;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+			border-radius: 5px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+			text-align: center;
+		}
+		.card:hover {
+			box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+			transform: translateY(-5px);
+			cursor: pointer;
+		}
+		.card img {
+			height: 60px;
+			margin-bottom: 10px;
+		}
+		.card h2 {
+			margin: 0;
+			font-size: 18px;
+			color: #9c27b0;
+			font-weight: normal;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<h1>Pardo's Coding Examples</h1>
+		<i class="icon fas fa-user-circle"></i>
+	</header>
+	<div class="main-content">
+        <div class="card">
+      <a href="Snake/" >
+        <img src="SnakeLogo.png">
+        <h2>Snake Game</h2>
+      </a>
+	  
+    </div>
+	<div class="card">
+		<a href="Tetris/" >
+		  <img src="TetrisLogo.png">
+		  <h2>Tetris</h2>
+		</a>
+	  </div>
+  </div>
+</body>

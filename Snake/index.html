@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍</title>
+    <style>
+      /* BODY OF WEBPAGE */
+        body {
+          background-color: #b3b28a;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0;
+          font-family: sans-serif;
+          flex-direction: column;
+          overflow: hidden;
+        }
+        /* WELCOME SCREEN */
+        #welcome-screen,
+        #game-over-screen {
+          background-color: #b3b28a;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 10px;
+          font-family: sans-serif;
+          flex-direction: column;
+        }
+        /* CANVAS : WHERE THE JS objects will be located */
+        canvas {
+          display: none;
+          margin: 0 auto;
+          background-color: #ffffff;
+          width: calc(100%);
+          height: calc(100%);
+        }
+        /* CONTENT WRAPPER */
+        .content-wrapper {
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+  <div id="welcome-screen">
+    <h1>Welcome to the Snake Game!</h1>
+    <p>Current Speed: <span id="selected-speed">Medium</span></p>
+    <p>Select Speed:</p>
+    <div id="speed-buttons">
+      <button id="slow-button">Slow</button>
+      <button id="medium-button">Medium</button>
+      <button id="fast-button">Fast</button>
+    </div>
+    <p></p>
+    <button id="start-button">Start Game</button>
+  </div>
+
+  <div id="game-over-screen" style="display: none;">
+    <h1>Game Over!</h1>
+    <p>Previous Score: <span id="previous-score">0</span>    High Score: <span id="high-score">0</span></p>
+    <p>Select Speed:
+      <button id="slow-button-2">Slow</button>
+      <button id="medium-button-2">Medium</button>
+      <button id="fast-button-2">Fast</button>
+    </p>
+    <p>Current Speed: <span id="selected-speed-2">Medium</span></p>
+    <button id="restart-button">Restart Game</button>
+  </div>
+
+  <div class="content-wrapper">
+    <div id="score-container" style="display: none;">
+      <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 20px;">Snake Game</h1>
+      <p>Current Score: <span id="current-score">0</span></p>
+    </div>
+    
+      <canvas id="game" width="700" height="700"></canvas>
+  </div>
+
+    <script>
+
+
+
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const scale = 50;
+const rows = canvas.height / scale;
+const cols = canvas.width / scale;
+const bgImage = new Image();
+bgImage.src = 'bg.png';
+var speed = 250;
+let snake, fruit;
+let allowChangeDirection = true;
+let gameLoopInterval;
+
+const fastspeed = 75
+const medspeed = 150
+const slowspeed = 250
+const numfruits = 11; // Pre determined # of fruits
+
+function selectImage(numfruits){
+  const randomIndex = Math.floor(Math.random() * numfruits) + 1;
+  const image = new Image();
+  image.src = 'fruits/f' + randomIndex + '.png';
+  return image;
+}
+
+const startButton = document.getElementById('start-button');
+const welcomeScreen = document.getElementById('welcome-screen');
+const scoreContainer = document.getElementById('score-container');
+
+startButton.addEventListener('click', () => {
+  welcomeScreen.style.display = 'none';
+  scoreContainer.style.display = 'block';
+  canvas.style.display = 'block';
+});
+
+// Speed of the game
+
+// Slow, medium, and fast buttons
+const slowButton = document.getElementById('slow-button');
+const mediumButton = document.getElementById('medium-button');
+const fastButton = document.getElementById('fast-button');
+
+// Add the following function to update the speed indicator text
+function updateSpeedIndicator(speedText) {
+  document.getElementById('selected-speed').innerText = speedText;
+  document.getElementById('selected-speed-2').innerText = speedText;
+}
+
+// Update the speed indicator in each button event listener
+slowButton.addEventListener('click', () => {
+  speed = slowspeed;
+  slowButton.classList.add('selected');
+  mediumButton.classList.remove('selected');
+  fastButton.classList.remove('selected');
+  updateSpeedIndicator('Slow');
+  // startGame();
+  showGameScreen();
+});
+
+mediumButton.addEventListener('click', () => {
+  speed = medspeed;
+  slowButton.classList.remove('selected');
+  mediumButton.classList.add('selected');
+  fastButton.classList.remove('selected');
+  updateSpeedIndicator('Medium');
+  // startGame();
+  showGameScreen();
+});
+
+fastButton.addEventListener('click', () => {
+  speed = fastspeed;
+  slowButton.classList.remove('selected');
+  mediumButton.classList.remove('selected');
+  fastButton.classList.add('selected');
+  updateSpeedIndicator('Fast');
+  // startGame();
+  showGameScreen();
+});
+
+    // Add event listeners for the game over screen buttons
+    const slowButton2 = document.getElementById('slow-button-2');
+    const mediumButton2 = document.getElementById('medium-button-2');
+    const fastButton2 = document.getElementById('fast-button-2');
+    
+    slowButton2.addEventListener('click', () => {
+      speed = slowspeed;
+      slowButton2.classList.add('selected');
+      mediumButton2.classList.remove('selected');
+      fastButton2.classList.remove('selected');
+      updateSpeedIndicator('Slow');
+      // showGameScreen();
+    });
+    
+    mediumButton2.addEventListener('click', () => {
+      speed = medspeed;
+      slowButton2.classList.remove('selected');
+      mediumButton2.classList.add('selected');
+      fastButton2.classList.remove('selected');
+      updateSpeedIndicator('Medium');
+      // showGameScreen();
+    });
+    
+    fastButton2.addEventListener('click', () => {
+      speed = fastspeed;
+      slowButton2.classList.remove('selected');
+      mediumButton2.classList.remove('selected');
+      fastButton2.classList.add('selected');
+      updateSpeedIndicator('Fast');
+      // showGameScreen();
+    });
+
+    
+// Call the updateSpeedIndicator function to set the initial speed indicator text
+updateSpeedIndicator('Medium');
+
+function showGameScreen() {
+  document.getElementById('game-over-screen').style.display = 'none';
+  scoreContainer.style.display = 'block';
+  canvas.style.display = 'block';
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  fruit.draw();
+  snake.update();
+  snake.draw();
+
+  if (snake.eat(fruit)) {
+    fruit.pickLocation();
+  }
+
+  snake.checkCollision();
+
+  setTimeout(gameLoop, speed);
+}
+
+
+
+function startGame() {
+  welcomeScreen.style.display = 'none';
+  scoreContainer.style.display = 'block';
+  canvas.style.display = 'block';
+}
+
+function setup() {
+  snake = new Snake();
+  fruit = new Fruit();
+  fruit.pickLocation();
+  gameLoop();
+}
+
+setup();
+
+
+
+window.addEventListener('keydown', (evt) => {
+  if (allowChangeDirection) {
+    const direction = evt.key.replace('Arrow', '');
+    snake.changeDirection(direction);
+    allowChangeDirection = false;
+  }
+});
+
+// Add touch events for mobile users
+let touchStartX = 0;
+let touchStartY = 0;
+const minTouchDistance = 50;
+
+window.addEventListener('touchstart', (evt) => {
+  touchStartX = evt.touches[0].clientX;
+  touchStartY = evt.touches[0].clientY;
+});
+
+window.addEventListener('touchmove', (evt) => {
+  const touchEndX = evt.touches[0].clientX;
+  const touchEndY = evt.touches[0].clientY;
+  const touchDistanceX = touchEndX - touchStartX;
+  const touchDistanceY = touchEndY - touchStartY;
+
+  if (Math.abs(touchDistanceX) > Math.abs(touchDistanceY)) {
+    // Horizontal swipe
+    if (touchDistanceX > minTouchDistance && snake.xSpeed !== -scale) {
+      snake.changeDirection('Right');
+      allowChangeDirection = false;
+    } else if (touchDistanceX < -minTouchDistance && snake.xSpeed !== scale) {
+      snake.changeDirection('Left');
+      allowChangeDirection = false;
+    }
+  } else {
+    // Vertical swipe
+    if (touchDistanceY > minTouchDistance && snake.ySpeed !== -scale) {
+      snake.changeDirection('Down');
+      allowChangeDirection = false;
+    } else if (touchDistanceY < -minTouchDistance && snake.ySpeed !== scale) {
+      snake.changeDirection('Up');
+      allowChangeDirection = false;
+    }
+  }
+});
+
+
+
+function Snake() {
+  this.x = 0; this.y = 0;
+  this.xSpeed = scale; this.ySpeed = 0;
+  this.total = 0; this.tail = [];
+ 
+ 
+  // This.draw contains the color and the script for drawing the individual squares for the snake
+  this.draw = function() {
+  if (!this.middleImage) {
+    this.middleImage = new Image();
+    this.middleImage.src = 'body/middle.png';
+  }
+
+  // Draw the tail segments
+  for (let i = 0; i < this.tail.length; i++) {
+    ctx.drawImage(this.middleImage, this.tail[i].x, this.tail[i].y, scale, scale);
+  }
+
+  // Draw the head segment
+  ctx.drawImage(this.middleImage, this.x, this.y, scale, scale);
+};
+
+
+  this.update = function() {
+    allowChangeDirection = true;
+    for (let i = 0; i < this.tail.length - 1; i++) 
+      this.tail[i] = this.tail[i + 1];
+    if (this.total >= 1)
+       this.tail[this.total - 1] = { x: this.x, y: this.y };
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    if (this.x >= canvas.width) this.x = 0;
+    else if (this.y >= canvas.height) this.y = 0;
+    else if (this.x < 0) this.x = canvas.width;
+    else if (this.y < 0) this.y = canvas.height;
+  }
+  this.changeDirection = function(direction) {
+    if ((direction == 'w' || direction == 'W' || direction == 'Up') && this.ySpeed !== scale) { this.xSpeed = 0; this.ySpeed = -scale; }
+    if ((direction == 's' || direction == 'S' || direction == 'Down') && this.ySpeed !== -scale) { this.xSpeed = 0; this.ySpeed = scale; }
+    if ((direction == 'a' || direction == 'A' || direction == 'Left') && this.xSpeed !== scale) { this.xSpeed = -scale; this.ySpeed = 0; }
+    if ((direction == 'd' || direction == 'D' || direction == 'Right') && this.xSpeed !== -scale) { this.xSpeed = scale; this.ySpeed = 0; }
+  }
+  this.eat = function(fruit) {
+    if (this.x === fruit.x && this.y === fruit.y) {
+    this.total++;
+    updateScore(this.total); // Update the score display
+    return true;
+  }
+  return false;
+};
+
+
+this.checkCollision = function() {
+    for (let i = 0; i < this.tail.length; i++) {
+      if (this.x === this.tail[i].x && this.y === this.tail[i].y) { 
+
+        this.tail = []; 
+        gameOver(this.total);
+        updateScore(0); 
+        this.total = 0; 
+
+      }
+    }
+  }
+
+}
+
+
+function gameOver(score) {
+  canvas.style.display = 'none';
+  scoreContainer.style.display = 'none';
+  document.getElementById('previous-score').innerText = score;
+  document.getElementById('game-over-screen').style.display = 'flex';
+}
+
+const restartButton = document.getElementById('restart-button');
+restartButton.addEventListener('click', () => {
+  document.getElementById('game-over-screen').style.display = 'none';
+  scoreContainer.style.display = 'block';
+  canvas.style.display = 'block';
+  setup();
+});
+
+
+function updateScore(currentScore) {
+  const currentScoreElement = document.getElementById('current-score');
+  const highScoreElement = document.getElementById('high-score');
+
+  currentScoreElement.textContent = currentScore;
+
+  const currentHighScore = parseInt(localStorage.getItem('highScore')) || 0;
+
+  if (currentScore > currentHighScore) {
+    localStorage.setItem('highScore', currentScore);
+    highScoreElement.textContent = currentScore;
+  }
+
+  updateHighScoreDisplay();
+
+}
+
+function updateHighScoreDisplay() {
+  const highScoreElement = document.getElementById('high-score');
+  const currentHighScore = parseInt(localStorage.getItem('highScore')) || 0;
+  highScoreElement.textContent = currentHighScore;
+}
+
+window.onload = updateHighScoreDisplay;
+
+
+function Fruit() {
+  this.x;
+  this.y;
+  this.fruit = selectImage(numfruits);
+
+  let possibleLocations = [];
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      possibleLocations.push({ x: j * scale, y: i * scale });
+    }
+  }
+
+  this.pickLocation = function() {
+    let unoccupiedLocations = possibleLocations.filter(
+      (location) =>
+        location.x !== snake.x ||
+        location.y !== snake.y ||
+        snake.tail.every(
+          (tailSegment) =>
+            tailSegment.x !== location.x || tailSegment.y !== location.y
+        )
+    );
+
+    if (unoccupiedLocations.length === 0) {
+      // If there are no unoccupied locations left, the game is won
+      gameOver(snake.total);
+    } else {
+      let randomIndex = Math.floor(Math.random() * unoccupiedLocations.length);
+      this.x = unoccupiedLocations[randomIndex].x;
+      this.y = unoccupiedLocations[randomIndex].y;
+    }
+
+    this.fruit = selectImage(numfruits);
+  };
+
+  this.draw = function() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+    ctx.fillRect(this.x, this.y, scale, scale);
+
+    ctx.drawImage(this.fruit, this.x, this.y, scale, scale);
+  };
+}
+
+
+   
+  updateHighScoreDisplay();
+
+    </script>
+
+
+
+
+
+</body>
+</html>
