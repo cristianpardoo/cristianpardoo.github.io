@@ -1,71 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Tetris Game</title>
-    <style>
-      body {
-        background-color: #1A2B3C;
-        color: #FFFFFF;
-        text-align: center;
-        font-family: Arial, sans-serif;
-        font-size: 24px;
-        margin: 0;
-        padding: 0;
-        overflow:hidden ;
-        
-      }
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tetris Game</title>
+  <style>
+    body {
+      background-color: #1A2B3C;
+      color: #FFFFFF;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 24px;
+      margin: 0;
+      padding: 0;
+      overflow:hidden ;
+    }
+    img {
+      display: flex;
+      margin: 0 auto;
+      max-width: 80%;
+      height: 80%;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      margin: 0 auto;
+    }
+    .canvas-wrapper {
+      width: 70%;
+    }
+    canvas {
+      display: flex;
+      margin: auto;
+      border: 1px solid black;
+    }
+
+    /* Added CSS for mobile */
+    @media (max-width: 768px) {
       img {
+        max-width: 30%;
+        height: 30%;
+      }
+      #game-screen {
+        flex-direction: column;
+      }
+      .canvas-wrapper-2 {
         display: flex;
-        margin: 0 auto;
-        max-width: 80%;
-        height: 80%;
+        flex-direction: column;
+        align-items: center;
       }
-      .container {
-        display: flex;
-        justify-content: space-between;
-        width: 80%;
-        margin: 0 auto;
+      #rotate-counterclockwise,
+      #rotate-clockwise,
+      #move-left,
+      #move-right,
+      #move-down,
+      #drop {
+        display: none;
       }
-      .canvas-wrapper {
-        width: 70%;
+      #rotate-counterclockwise-mobile,
+      #rotate-clockwise-mobile {
+        display: inline-block;
       }
-      canvas {
-        display: flex;
-        margin: auto;
-        border: 1px solid black;
-      }
-    </style>
-  </head>
+    }
+  </style>
+</head>
 <body>
   <div id="welcome-screen">
-    <h1>Tetris Game</h1>
-    <img src="TetrisLogo.png" alt="Tetris Logo" width="100" height="80" style="margin-bottom: 20px;">
+    <h1>Tetris Game <img src="TetrisLogo.png" alt="Tetris Logo" class="tetris-logo"></h1>
     <button id="start-button" >Start</button>
     <div style="white-space: pre-wrap;">
       &#10;Legend:&#10;Left Arrow -> Left&#10;Right Arrow -> Right&#10;Up -> Immediate Drop&#10;Down -> Drop by 1&#10;K -> CounterClockwise&#10;L -> Clockwise&#10;P -> Pause&#10;
-      </div>
+    </div>
   </div>
-  <div id="game-screen" class="hidden" style="display: none;">    
-    <div class="canvas-wrapper-1">
-      <h2>Next Piece</h2>
-      <canvas id="next-piece" width="80" height="40"></canvas>
-      <h2>Held Piece</h2>
-      <canvas id="held-piece" width="80" height="40"></canvas>
-      <div id="score">Score: </div>
-      <div>
-   
-      </div>
-  </div>
+  <div id="game-screen" class="hidden" style="display: none;">
     <div class="canvas-wrapper-2">
       <h2>Game Board</h2>
       <canvas id="canvas" width="200" height="400" style="margin-bottom: 30px;"></canvas>
       <button id="rotate-counterclockwise" style="background-color: red; color: white; margin-right: 10px; font-size: 2em;">&#8634;</button>
       <button id="rotate-clockwise" style="background-color: red; color: white; font-size: 2em;">&#8635;</button>
-      <button id="move-left" style="background-color: red; color: white; margin-right: 10px; font-size: 2em;">&#8592;</button>
+      <button id="move-left" style="background-color: red; color: white; margin-bottom: 10px; font-size: 2em;">&#8592;</button>
       <button id="move-right" style="background-color: red; color: white; margin-right: 10px; font-size: 2em;">&#8594;</button>
       <button id="move-down" style="background-color: red; color: white; margin-right: 10px; font-size: 2em;">&#8595;</button>
       <button id="drop" style="background-color: red; color: white; margin-right: 10px; font-size: 2em;">&#8593;</button>       
+
+    </div>
+    <div class="canvas-wrapper-3">
+            <h2>Next Piece</h2>
+      <canvas id="next-piece" width="80" height="40"></canvas>
+      <h2>Held Piece</h2>
+      <canvas id="held-piece" width="80" height="40"></canvas>
+      <div id="score">Score: </div>
     </div>
 
   </div>
@@ -214,13 +238,29 @@ function startGame() {
   document.getElementById("welcome-screen").style.display = "none";
   document.getElementById("game-screen").style.display = "block";
 
-  // game loop
-  setInterval(() => {
+  gameInterval = setInterval(() => { // Modify the setInterval() call
     if (!paused) {
       moveDown();
     }
   }, 1000);
 }
+
+function gameOver() {
+  clearInterval(gameInterval); // Stop the game loop
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText("Game Over", canvas.width / 2 - 45, canvas.height / 2);
+
+  playGameOverSound();
+}
+
+function playGameOverSound() {
+  const gameOverSound = new Audio('path/to/your/game-over-sound.mp3');
+  gameOverSound.play();
+}
+
 
 // Add an event listener for the "start" button
 document.getElementById("start-button").addEventListener("click", startGame);
@@ -432,26 +472,25 @@ function drawHeldTetromino() {
       drawTetromino();
     }
     // Piece moves down 1 row
-function moveDown() {
-  if (!collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y + 1)) {
-    eraseTetromino();
-    currentTetromino.y++;
-    drawTetromino();
-  } else {
-    merge(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y);
-    const clearedRows = checkFullRows();
-    if (clearedRows) {
-      score += calculateScore(clearedRows);
-      updateScoreDisplay();
-    }
-    currentTetromino = createTetromino();
-    canHold = true;
-    if (collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y)) {
-      gameOver();
-    }
-    generateNextTetromino();
-  }
-}
+    function moveDown() {
+            if (!collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y + 1)) {
+              eraseTetromino();
+              currentTetromino.y++;
+              drawTetromino();
+            } else {
+              merge(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y);
+              const fullRows = checkFullRows();
+              score += fullRows; // You can adjust the scoring system as desired
+              updateScoreDisplay();
+              currentTetromino = nextTetromino;
+              if (collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y)) {
+                // Game over logic here
+                gameOver();
+              }
+              drawBoard();
+              generateNextTetromino();
+            }
+        }
 
     // Piece moves Left
     function moveLeft() {
