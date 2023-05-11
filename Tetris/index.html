@@ -8,14 +8,17 @@
 <body>
   <div id="welcome-screen">
     <h1>Tetris Game <img src="TetrisLogo.png" alt="Tetris Logo" class="tetris-logo"></h1>
-    <button id="start-button" >Start</button>
+    <button id="start-button" class="large-button">Start</button>
     <div style="white-space: pre-wrap;">
       &#10;Legend:&#10;Left Arrow -> Left&#10;Right Arrow -> Right&#10;Up -> Immediate Drop&#10;Down -> Drop by 1&#10;K -> CounterClockwise&#10;L -> Clockwise&#10;P -> Pause&#10;
     </div>
   </div>
   <div id="game-screen" class="hidden" style="display: none;">
-
-    <h1>Tetris</h1>
+    <div class="TitleRow">
+      <h1>Tetris</h1>
+      <img src="TetrisLogo.png" alt="Tetris Logo" class="tetris-logo" >
+      
+    </div>
     <div class="game-board-canvas">
       <canvas id="canvas" width="200" height="400" ></canvas>
       <div class="info-canvas">

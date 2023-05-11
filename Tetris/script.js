@@ -519,6 +519,21 @@ function setBackgroundColor() {
 setBackgroundColor();
 // End TOUCH DISPLAY functions
 
+// DISABLE ZOOM
+window.addEventListener('touchstart', function onFirstTouch() {
+  // this will only run once
+  window.removeEventListener('touchstart', onFirstTouch, false);
+
+  let lastTouchEnd = 0;
+  document.documentElement.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+}, false);
+
 
     document.getElementById('start-button').addEventListener('click', function() {
       document.getElementById('welcome-screen').classList.add('hidden');

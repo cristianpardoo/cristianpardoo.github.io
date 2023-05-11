@@ -28,11 +28,18 @@ body {
 
   }
   
-  .row-1-buttons,
+  .row-1-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
   .row-2-buttons {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    margin-top: 5px;
   }
 
   .game-screen {
@@ -47,6 +54,10 @@ body {
     border: 5px solid rgb(255, 255, 255); 
   }
 
+  .TitleRow {
+    display: flex;
+    flex-direction: row;
+  }
 
 
   .game-board-canvas {
@@ -71,6 +82,8 @@ body {
     max-width: 80%;
     height: 80%;
   }
+
+  
   .container {
     display: flex;
     justify-content: space-between;
@@ -87,6 +100,22 @@ body {
     border: 5px solid rgb(255, 255, 255); 
 
   }
-  
 
   
+  .TitleRow {
+    display: flex;
+    align-items: center;
+  }
+  
+  .TitleRow h1 {
+    margin-right: 10px; /* Adjust the margin as desired */
+  }
+  
+  .TitleRow .tetris-logo {
+    height: 100%; /* Set the height to 100% of the parent container */
+    max-height: 1em; /* Ensure the image doesn't exceed the line height of the text */
+  }
+
+  .large-button {
+    font-size: 1em; /* Triple the font size */
+  }
