@@ -78,6 +78,19 @@ drop();
   document.getElementById("move-down").addEventListener("click", moveDown);
   document.getElementById("drop").addEventListener("click", drop);
   document.getElementById("hold-button").addEventListener("click", holdPiece);
+  document.getElementById("pause-button").addEventListener("click", () => {
+    paused = !paused;
+    if (paused) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "30px Arial";
+      ctx.fillStyle = "white";
+      ctx.fillText("Paused", canvas.width/2 - 45, canvas.height/2);
+    } else {
+      drawBoard();
+  }
+  });
+
 //   document.getElementById("hold").addEventListener("click", holdPiece());
 
 
@@ -384,6 +397,7 @@ function drawHeldTetromino() {
               score += fullRows; // You can adjust the scoring system as desired
               updateScoreDisplay();
               currentTetromino = nextTetromino;
+              canHold = true
               if (collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y)) {
                 // Game over logic here
                 gameOver();

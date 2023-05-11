@@ -9,16 +9,29 @@ body {
     padding: 0;
     overflow:hidden ;
     border: 5px solid rgb(255, 255, 255); 
-
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    touch-action: manipulation;
     
   }
+
   .row-1-buttons button {
     width: calc(95% / 4);
+    text-align: center;
+  }
+  
+  .row-2-buttons button {
+    width: calc(95% / 4);
+    text-align: center;
+  }
+  
+  .row-1-buttons,
+  .row-2-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
 
-   .row-2-buttons button {
-    width: calc(95% / 3);
-  }
   .game-screen {
   display: flex;
   flex-direction: row;
@@ -32,22 +45,7 @@ body {
   }
 
 
-  .row-1-buttons {
-    display: flex;
-    flex-direction: row;
-    margin: auto;
-    justify-content: center;
-    /* background-color:#1A2B3C; */
-    /* border: 5px solid rgb(255, 255, 255);  */
-  }
 
-    .row-2-buttons {
-        display: flex;
-        flex-direction: row;
-        margin: auto;
-        justify-content: center;
-    /* border: 5px solid rgb(255, 255, 255);  */
-    }
   .game-board-canvas {
       display: flex; 
       /* flex-direction: row; */
