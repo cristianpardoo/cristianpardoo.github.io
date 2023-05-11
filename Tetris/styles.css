@@ -1,6 +1,6 @@
 
 body {
-    background-color: #1A2B3C;
+    /* background-color: #b861a5; */
     color: #FFFFFF;
     text-align: center;
     font-family: Arial, sans-serif;
@@ -18,11 +18,14 @@ body {
   .row-1-buttons button {
     width: calc(95% / 4);
     text-align: center;
+    background-color: gray;
   }
   
   .row-2-buttons button {
     width: calc(95% / 4);
     text-align: center;
+    background-color: gray;
+
   }
   
   .row-1-buttons,
