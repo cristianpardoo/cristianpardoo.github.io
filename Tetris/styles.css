@@ -68,6 +68,12 @@ body {
   
   }
   
+  #welcome-screen {
+    overflow:visible; 
+    overflow-y: scroll;
+}
+
+
   @media screen and (max-width: 480px) {
   .info-canvas {
     width: 100%;

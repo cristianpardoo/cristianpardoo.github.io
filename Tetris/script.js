@@ -1,3 +1,55 @@
+// Menu Logic:
+
+function updateSpeedIndicator(speedText) {
+  document.getElementById('selected-speed').innerText = speedText;
+}
+
+const fastspeed = 80
+const medspeed = 160
+const slowspeed = 600
+
+
+// Add event listeners for the game over screen buttons
+const slowButton = document.getElementById('slow-button');
+const mediumButton = document.getElementById('medium-button');
+const fastButton = document.getElementById('fast-button');
+
+// Update the speed indicator in each button event listener
+slowButton.addEventListener('click', () => {
+  curspeed = slowspeed;
+  slowButton.classList.add('selected');
+  mediumButton.classList.remove('selected');
+  fastButton.classList.remove('selected');
+  updateSpeedIndicator('Slow');
+  // startGame();
+  // showGameScreen();
+});
+
+mediumButton.addEventListener('click', () => {
+  curspeed = medspeed;
+  slowButton.classList.remove('selected');
+  mediumButton.classList.add('selected');
+  fastButton.classList.remove('selected');
+  updateSpeedIndicator('Medium');
+  // startGame();
+  // showGameScreen();
+});
+
+fastButton.addEventListener('click', () => {
+  curspeed = fastspeed;
+  slowButton.classList.remove('selected');
+  mediumButton.classList.remove('selected');
+  fastButton.classList.add('selected');
+  updateSpeedIndicator('Fast');
+  // startGame();
+  // showGameScreen();
+});
+
+
+
+
+
+
 // initialize variables
 const canvas = document.getElementById("canvas");
 const gameview = document.getElementById("game-screen");
@@ -416,7 +468,7 @@ function drawHeldTetromino() {
     for (let row = 0; row < tetromino.length; row++) {
       for (let col = 0; col < tetromino[row].length; col++) {
         if (tetromino[row][col]) {
-          console.log("row", row, "col", col, "x ", x," y ", y)
+          // console.log("row", row, "col", col, "x ", x," y ", y)
             if(y < 0){
               // console.log("row", row, "col", col, "x ", x," y ", y)
               gameOver()
@@ -623,7 +675,7 @@ window.addEventListener('touchstart', function onFirstTouch() {
   let lastTouchEnd = 0;
   document.documentElement.addEventListener('touchend', function (event) {
     const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
+    if (now - lastTouchEnd <= 250) {
       event.preventDefault();
     }
     lastTouchEnd = now;
