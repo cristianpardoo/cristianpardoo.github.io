@@ -1,5 +1,6 @@
 // initialize variables
 const canvas = document.getElementById("canvas");
+const gameview = document.getElementById("game-screen");
 const ctx = canvas.getContext("2d");
 const blockSize = 20;
 const boardWidth = canvas.width / blockSize;
@@ -13,48 +14,53 @@ const tetrominoes = [
   [[0, 2, 2], [2, 2, 0]],
   [[3, 3], [3, 3]],
   [[4, 4, 0], [0, 4, 4]],
-  [[5, 5, 5, 5]],
+  [[0,0,0,0], [5, 5, 5, 5]],
   [[0, 0, 6], [6, 6, 6]],
   [[7,0,0], [7,7,7]]
   ];
 let board = [];
 let score = 0;
+let curspeed = 1000;
 
 let currentTetromino = createTetromino();
 let paused = false
 let heldTetromino = null;
 let canHold = true;
+let isgameover = false;
 
 // Add touch events for mobile users
 const minTouchDistance = 50;
 let touchStartX = null;
 let touchStartY = null;
-window.addEventListener('touchstart', (evt) => {
-touchStartX = evt.touches[0].clientX;
-touchStartY = evt.touches[0].clientY;
-});
+  window.addEventListener('touchstart', (evt) => {
+  touchStartX = evt.touches[0].clientX;
+  touchStartY = evt.touches[0].clientY;
+  });
 
 window.addEventListener('touchmove', (evt) => {
-const touchEndX = evt.touches[0].clientX;
-const touchEndY = evt.touches[0].clientY;
-const touchDistanceX = touchEndX - touchStartX;
-const touchDistanceY = touchEndY - touchStartY;
+   if (!isgameover) {
+    const touchEndX = evt.touches[0].clientX;
+  const touchEndY = evt.touches[0].clientY;
+  const touchDistanceX = touchEndX - touchStartX;
+  const touchDistanceY = touchEndY - touchStartY;
 
-if (Math.abs(touchDistanceX) > Math.abs(touchDistanceY)) {
-// Horizontal swipe
-if (touchDistanceX > minTouchDistance) {
-moveRight();
-} else if (touchDistanceX < -minTouchDistance) {
-moveLeft();
-}
-} else {
-// Vertical swipe
-if (touchDistanceY > minTouchDistance) {
-moveDown();
-} else if (touchDistanceY < -minTouchDistance) {
-drop();
-}
-}
+  if (Math.abs(touchDistanceX) > Math.abs(touchDistanceY)) {
+  // Horizontal swipe
+  if (touchDistanceX > minTouchDistance) {
+  moveRight();
+  } else if (touchDistanceX < -minTouchDistance) {
+  moveLeft();
+  }
+  } else {
+  // Vertical swipe
+  if (touchDistanceY > minTouchDistance) {
+  moveDown();
+  } else if (touchDistanceY < -minTouchDistance) {
+  drop();
+  }
+  }
+   }
+  
 });
 
 // Button Listeners
@@ -98,45 +104,50 @@ drop();
 
 
 document.addEventListener("keydown", event => {
-if (event.code === "KeyA" || event.code === "ArrowLeft") { // A key or Left arrow key
-    moveLeft();
-} 
-else if (event.code === "KeyD" || event.code === "ArrowRight") { // D key or Right arrow key
-    moveRight();
-} 
-else if (event.code === "KeyS" || event.code === "ArrowDown") { // S key or Down arrow key
-    moveDown();
-}
-else if (event.code === "KeyW" || event.code === "ArrowUp") { // W key or Up arrow key
-    drop();
-    moveDown();
-} 
-else if (event.code === "KeyL") {
+
+  if (!isgameover){
+    if (event.code === "KeyA" || event.code === "ArrowLeft") { // A key or Left arrow key
+      moveLeft();
+  } 
+  else if (event.code === "KeyD" || event.code === "ArrowRight") { // D key or Right arrow key
+      moveRight();
+  } 
+  else if (event.code === "KeyS" || event.code === "ArrowDown") { // S key or Down arrow key
+      moveDown();
+  }
+  else if (event.code === "KeyW" || event.code === "ArrowUp") { // W key or Up arrow key
+      drop();
+      moveDown();
+  } 
+  else if (event.code === "KeyL") {
+      rotate("clockwise");
+  } 
+  else if (event.code === "KeyK") {
     rotate("clockwise");
-} 
-else if (event.code === "KeyK") {
-  rotate("clockwise");
-  rotate("clockwise");
-  rotate("clockwise");
+    rotate("clockwise");
+    rotate("clockwise");
+    }
+    else if (event.code === "KeyO") {
+      holdPiece();
+    }
+  
+  
+    else if (event.code === "KeyP")
+    if (event.code === "KeyP") {
+    paused = !paused;
+    if (paused) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "30px Arial";
+      ctx.fillStyle = "white";
+      ctx.fillText("Paused", canvas.width/2 - 45, canvas.height/2);
+    } else {
+      drawBoard();
   }
-  else if (event.code === "KeyO") {
-    holdPiece();
+  }}
+    
   }
-
-
-  else if (event.code === "KeyP")
-  if (event.code === "KeyP") {
-  paused = !paused;
-  if (paused) {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "30px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText("Paused", canvas.width/2 - 45, canvas.height/2);
-  } else {
-    drawBoard();
-}
-}});
+);
 
 // current tetromino
 updateScoreDisplay()
@@ -145,6 +156,9 @@ generateBoard()
 drawGrid()
 // Keypress Event Listener
 generateNextTetromino();
+
+
+
 
 
 // Add the startGame function
@@ -156,25 +170,99 @@ function startGame() {
     if (!paused) {
       moveDown();
     }
-  }, 1000);
+  }, curspeed);
 }
 
+// function gameOver() { // WORKING 
+//   clearInterval(gameInterval); // Stop the game loop
+//   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+//   ctx.fillRect(0, 0, canvas.width, canvas.height);
+//   ctx.font = "30px Arial";
+//   ctx.fillStyle = "white";
+  
+//   playGameOverSound();
+
+//   // Gray out game screen
+//   let gameScreen = document.getElementById("game-screen");
+//   gameScreen.style.backgroundColor = "rgba(0, 0, 0, 0.8)"; // gray color with some transparency
+//   gameScreen.style.pointerEvents = "none"; // disable any interaction
+//     gameScreen.fillText("Game Over", canvas.width / 2 - 45, canvas.height / 2);
+
+// }
+
+
+
+// function playGameOverSound() {
+//   var mp3 = document.createElement("audio");
+//   mp3.setAttribute('src', 'gameover.mp3');
+//   mp3.load();
+//   document.documentElement.appendChild(mp3);
+//   mp3.play();
+//   // const gameOverSound = new Audio('gameover.aac');
+//   // gameOverSound.play();
+// }
+
 function gameOver() {
+  isgameover = true;
+
+
+  playGameOverSound();
+
+  // Gray out and blur game screen
   clearInterval(gameInterval); // Stop the game loop
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.font = "30px Arial";
   ctx.fillStyle = "white";
-  ctx.fillText("Game Over", canvas.width / 2 - 45, canvas.height / 2);
+  ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+ // gray color with some transparency
+  
+  //document.getElementById("game-over-screen").style.display = "none";
 
-  playGameOverSound();
+    // Gray out game screen
+    let gameScreen = document.getElementById("game-screen");
+    gameScreen.style.backgroundColor = "rgba(0, 0, 0, 20)"; // gray color with some transparency
+    gameScreen.style.pointerEvents = "none"; // disable any interaction
+    gameScreen.style.filter = "blur(5px)"; // add blur effect
+    // Show game over screen
+    let gameOverScreen = document.getElementById("game-over-screen");
+  
+    gameOverScreen.style.display = "flex";
+  
 }
+
+
 
 function playGameOverSound() {
-  const gameOverSound = new Audio('path/to/your/game-over-sound.mp3');
-  gameOverSound.play();
+ Sound("gameover.mp3")
 }
 
+
+function Sound(filename) {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Load the audio file
+  const request = new XMLHttpRequest();
+  request.open('GET', filename, true);
+  request.responseType = 'arraybuffer';
+
+  request.onload = function() {
+    // Decode the audio data
+    audioContext.decodeAudioData(request.response, function(buffer) {
+      // Create a source node
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+
+      // Connect the source node to the audio destination (e.g., speakers)
+      source.connect(audioContext.destination);
+
+      // Start playing the audio
+      source.start(0);
+    });
+  };
+
+  request.send();
+}
 
 // Add an event listener for the "start" button
 document.getElementById("start-button").addEventListener("click", startGame);
@@ -219,7 +307,7 @@ function drawGrid(){
 // draw next tetromino
 function drawNextTetromino() {
   const canvas = document.getElementById("next-piece");
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d"); 
   const blockSize = 20;
   const width = canvas.width / blockSize;
   const height = canvas.height / blockSize;
@@ -328,7 +416,13 @@ function drawHeldTetromino() {
     for (let row = 0; row < tetromino.length; row++) {
       for (let col = 0; col < tetromino[row].length; col++) {
         if (tetromino[row][col]) {
-          board[row + y][col + x] = currentTetromino.color;
+          console.log("row", row, "col", col, "x ", x," y ", y)
+            if(y < 0){
+              // console.log("row", row, "col", col, "x ", x," y ", y)
+              gameOver()
+            } 
+              board[row + y][col + x] = currentTetromino.color;
+
         }
       }
     }
@@ -387,25 +481,27 @@ function drawHeldTetromino() {
     }
     // Piece moves down 1 row
     function moveDown() {
-            if (!collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y + 1)) {
-              eraseTetromino();
-              currentTetromino.y++;
-              drawTetromino();
+              if (!collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y + 1)) {
+                  eraseTetromino();
+                  currentTetromino.y++;
+                  drawTetromino();
+                
+
             } else {
-              merge(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y);
-              const fullRows = checkFullRows();
-              score += fullRows; // You can adjust the scoring system as desired
-              updateScoreDisplay();
-              currentTetromino = nextTetromino;
-              canHold = true
-              if (collides(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y)) {
-                // Game over logic here
-                gameOver();
+
+                merge(currentTetromino.tetromino, currentTetromino.x, currentTetromino.y);
+                const fullRows = checkFullRows();
+                score += fullRows; // You can adjust the scoring system as desired
+                updateScoreDisplay();
+                currentTetromino = nextTetromino;
+                canHold = true
+  
+                drawBoard();
+                generateNextTetromino();
               }
-              drawBoard();
-              generateNextTetromino();
+
             }
-        }
+        
 
     // Piece moves Left
     function moveLeft() {
